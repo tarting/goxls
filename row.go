@@ -14,18 +14,18 @@ type rowInfo struct {
 type Row struct {
 	wb   *WorkBook
 	info *rowInfo
-	cols map[uint16]contentHandler
+	Cols map[uint16]contentHandler
 }
 
 //Col Get the Nth Col from the Row, if has not, return nil.
 //Suggest use Has function to test it.
 func (r *Row) Col(i int) string {
 	serial := uint16(i)
-	if ch, ok := r.cols[serial]; ok {
+	if ch, ok := r.Cols[serial]; ok {
 		strs := ch.String(r.wb)
 		return strs[0]
 	} else {
-		for _, v := range r.cols {
+		for _, v := range r.Cols {
 			if v.FirstCol() <= serial && v.LastCol() >= serial {
 				strs := v.String(r.wb)
 				return strs[serial-v.FirstCol()]
@@ -39,7 +39,7 @@ func (r *Row) Col(i int) string {
 //For merged cells value is returned for first cell only
 func (r *Row) ColExact(i int) string {
 	serial := uint16(i)
-	if ch, ok := r.cols[serial]; ok {
+	if ch, ok := r.Cols[serial]; ok {
 		strs := ch.String(r.wb)
 		return strs[0]
 	}

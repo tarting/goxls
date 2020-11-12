@@ -17,7 +17,7 @@ func TestOpen(t *testing.T) {
 				row := sheet1.Row(i)
 				for index := row.FirstCol(); index < row.LastCol(); index++ {
 					fmt.Println(index, "==>", row.Col(index), " ")
-					fmt.Printf("%T\n", row.cols[uint16(index)])
+					fmt.Printf("%T\n", row.Cols[uint16(index)])
 				}
 				// col1 := .Cols[0]
 				// col2 := sheet1.Row(uint16(i)].Cols[1]
