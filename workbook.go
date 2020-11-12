@@ -3,10 +3,11 @@ package xls
 import (
 	"bytes"
 	"encoding/binary"
-	"golang.org/x/text/encoding/charmap"
 	"io"
 	"os"
 	"unicode/utf16"
+
+	"golang.org/x/text/encoding/charmap"
 )
 
 //xls workbook type
@@ -17,8 +18,8 @@ type WorkBook struct {
 	Xfs      []st_xf_data
 	Fonts    []Font
 	Formats  map[uint16]*Format
-	//All the sheets from the workbook
-	sheets         []*WorkSheet
+	//All the Sheets from the workbook
+	Sheets         []*WorkSheet
 	Author         string
 	rs             io.ReadSeeker
 	sst            []string
@@ -34,7 +35,7 @@ func newWorkBookFromOle2(rs io.ReadSeeker) *WorkBook {
 	wb.Formats = make(map[uint16]*Format)
 	// wb.bts = bts
 	wb.rs = rs
-	wb.sheets = make([]*WorkSheet, 0)
+	wb.Sheets = make([]*WorkSheet, 0)
 	wb.Parse(rs)
 	return wb
 }
@@ -255,21 +256,21 @@ func (w *WorkBook) get_string(buf io.ReadSeeker, size uint16) (res string, err e
 
 func (w *WorkBook) addSheet(sheet *boundsheet, buf io.ReadSeeker) {
 	name, _ := w.get_string(buf, uint16(sheet.Name))
-	w.sheets = append(w.sheets, &WorkSheet{bs: sheet, Name: name, wb: w, Visibility: TWorkSheetVisibility(sheet.Visible)})
+	w.Sheets = append(w.Sheets, &WorkSheet{bs: sheet, Name: name, wb: w, Visibility: TWorkSheetVisibility(sheet.Visible)})
 }
 
 //reading a sheet from the compress file to memory, you should call this before you try to get anything from sheet
-func (w *WorkBook) prepareSheet(sheet *WorkSheet) {
+func (w *WorkBook) PrepareSheet(sheet *WorkSheet) {
 	w.rs.Seek(int64(sheet.bs.Filepos), 0)
 	sheet.parse(w.rs)
 }
 
 //Get one sheet by its number
 func (w *WorkBook) GetSheet(num int) *WorkSheet {
-	if num < len(w.sheets) {
-		s := w.sheets[num]
+	if num < len(w.Sheets) {
+		s := w.Sheets[num]
 		if !s.parsed {
-			w.prepareSheet(s)
+			w.PrepareSheet(s)
 		}
 		return s
 	} else {
@@ -277,9 +278,9 @@ func (w *WorkBook) GetSheet(num int) *WorkSheet {
 	}
 }
 
-//Get the number of all sheets, look into example
+//Get the number of all Sheets, look into example
 func (w *WorkBook) NumSheets() int {
-	return len(w.sheets)
+	return len(w.Sheets)
 }
 
 //helper function to read all cells from file
@@ -287,10 +288,10 @@ func (w *WorkBook) NumSheets() int {
 //Warning: the helper function will need big memeory if file is large.
 func (w *WorkBook) ReadAllCells(max int) (res [][]string) {
 	res = make([][]string, 0)
-	for _, sheet := range w.sheets {
+	for _, sheet := range w.Sheets {
 		if len(res) < max {
 			max = max - len(res)
-			w.prepareSheet(sheet)
+			w.PrepareSheet(sheet)
 			if sheet.MaxRow != 0 {
 				leng := int(sheet.MaxRow) + 1
 				if max < leng {
