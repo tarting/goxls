@@ -1,5 +1,7 @@
 package xls
 
+// Modified by Trygvi Bech Arting (2020)
+
 import (
 	"fmt"
 	"math"

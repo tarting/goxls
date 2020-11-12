@@ -1,5 +1,7 @@
 package xls
 
+// Modified by Trygvi Bech Arting (2020)
+
 type rowInfo struct {
 	Index    uint16
 	Fcell    uint16
